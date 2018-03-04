@@ -58,6 +58,24 @@ public class MainActivity extends AppCompatActivity {
 
 
         //TODO (3) Create a new ItemTouchHelper with a SimpleCallback that handles both LEFT and RIGHT swipe directions
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                long id = (long) viewHolder.itemView.getTag();
+
+                removeGuest(id);
+
+                mAdapter.swapCursor(getAllGuests());
+
+            }
+        }).attachToRecyclerView(waitlistRecyclerView);
 
         // TODO (4) Override onMove and simply return false inside
 
@@ -133,6 +151,13 @@ public class MainActivity extends AppCompatActivity {
         cv.put(WaitlistContract.WaitlistEntry.COLUMN_GUEST_NAME, name);
         cv.put(WaitlistContract.WaitlistEntry.COLUMN_PARTY_SIZE, partySize);
         return mDb.insert(WaitlistContract.WaitlistEntry.TABLE_NAME, null, cv);
+    }
+
+    private boolean removeGuest (long id){
+
+      return  mDb.delete(WaitlistContract.WaitlistEntry.TABLE_NAME,
+                WaitlistContract.WaitlistEntry._ID+ "=" + id, null)>0;
+
     }
 
 
